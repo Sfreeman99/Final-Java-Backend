@@ -67,4 +67,17 @@ public class UserController {
      }
      return loginHash;
     }
+    @CrossOrigin()
+    @PostMapping("/logout")
+    public void logout(@RequestParam String username) {
+        try (Connection conn = DriverManager.getConnection(url)) {
+            PreparedStatement st = conn.prepareStatement("UPDATE CashUser SET loginhash = NULL WHERE username = (?)");
+            st.setString(1, username);
+            st.executeUpdate();
+            st.close();
+
+    } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
