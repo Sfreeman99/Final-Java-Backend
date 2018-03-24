@@ -52,6 +52,7 @@ public class UserController {
          st.executeUpdate();
          st.close();
          PreparedStatement ls = conn.prepareStatement("SELECT loginhash FROM CashUser WHERE username = ?");
+         ls.setString(1, user.Username);
          ResultSet rs = ls.executeQuery();
          while (rs.next()) {
              //Cash User Hash
