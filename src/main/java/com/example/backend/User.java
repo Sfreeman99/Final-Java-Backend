@@ -5,16 +5,14 @@ public class User {
         public String FirstName;
         public String LastName;
         public String Email;
-        public String Password1;
-        public String Password2;
+        public String Password;
 
         public User() {}
-        public User(String Username, String FirstName, String LastName, String Email, String Password1, String Password2){
+        public User(String Username, String FirstName, String LastName, String Email, String Password){
             this.FirstName = FirstName;
             this.LastName = LastName;
             this.Email = Email;
-            this.Password1 = Password1;
-            this.Password2 = Password2;
+            this.Password = Password;
             this.Username = Username;
         }
 
