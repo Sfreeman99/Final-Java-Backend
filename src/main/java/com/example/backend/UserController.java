@@ -18,7 +18,7 @@ public class UserController {
 
     @CrossOrigin()
     @PostMapping("/signup")
-    public void signupUser(@RequestBody User newUser) {
+    public void signupUser(@RequestBody SignupUser newUser) {
         try (Connection conn = DriverManager.getConnection(url)) {
             PreparedStatement st = conn.prepareStatement("INSERT INTO CashUser " +
                     "(username, first_name, last_name, email, passwordhash) " +
@@ -39,8 +39,8 @@ public class UserController {
 
     @CrossOrigin()
     @PostMapping("/login")
-    public HashMap<String, String> login(@RequestBody User user) {
-        HashMap loginHash = new HashMap();
+    public String login(@RequestBody LoginUser user) {
+        String loginHash = "";
      try (Connection conn = DriverManager.getConnection(url)) {
          PreparedStatement st = conn.prepareStatement("UPDATE CashUser SET loginhash = ? WHERE username = ?");
          SecureRandom random = new SecureRandom();
@@ -48,15 +48,15 @@ public class UserController {
          random.nextBytes(bytes);
          String token = new String(bytes, "UTF-8");
          st.setString(1, token);
-         st.setString(2, user.Username);
+         st.setString(2, user.username);
          st.executeUpdate();
          st.close();
          PreparedStatement ls = conn.prepareStatement("SELECT loginhash FROM CashUser WHERE username = ?");
-         ls.setString(1, user.Username);
+         ls.setString(1, user.username);
          ResultSet rs = ls.executeQuery();
          while (rs.next()) {
              //Cash User Hash
-             loginHash.put("CuH", rs.getString(1));
+             loginHash = rs.getString(1);
          }
          ls.close();
          rs.close();
@@ -68,6 +68,7 @@ public class UserController {
      }
      return loginHash;
     }
+
     @CrossOrigin()
     @PostMapping("/logout")
     public void logout(@RequestParam String username) {
