@@ -70,6 +70,30 @@ public class UserController {
     }
 
     @CrossOrigin()
+    @PostMapping("/usernameexists")
+    public boolean usernameExists(@RequestBody String username) {
+        int count = 0;
+        try (Connection conn = DriverManager.getConnection(url)) {
+            System.out.println(username);
+            PreparedStatement st = conn.prepareStatement("SELECT COUNT(username) FROM CashUser WHERE username = ? ");
+            st.setString(1, username);
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+               count += rs.getInt(1);
+            }
+            rs.close();
+            st.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        System.out.print(count);
+        if (count > 0)
+            return true;
+        else
+            return false;
+    }
+
+    @CrossOrigin()
     @PostMapping("/logout")
     public void logout(@RequestParam String username) {
         try (Connection conn = DriverManager.getConnection(url)) {
