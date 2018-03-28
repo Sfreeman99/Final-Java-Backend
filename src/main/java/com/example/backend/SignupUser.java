@@ -1,14 +1,14 @@
 package com.example.backend;
 
-public class User {
+public class SignupUser {
         public String Username;
         public String FirstName;
         public String LastName;
         public String Email;
         public String Password;
 
-        public User() {}
-        public User(String Username, String FirstName, String LastName, String Email, String Password){
+        public SignupUser() {}
+        public SignupUser(String Username, String FirstName, String LastName, String Email, String Password){
             this.FirstName = FirstName;
             this.LastName = LastName;
             this.Email = Email;
