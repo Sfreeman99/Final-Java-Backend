@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
 import java.sql.*;
-import java.util.HashMap;
 
 @RestController
 public class UserController {
@@ -18,7 +17,7 @@ public class UserController {
 
     @CrossOrigin()
     @PostMapping("/signup")
-    public void signupUser(@RequestBody SignupUser newUser) {
+    public String signupUser(@RequestBody SignupUser newUser) {
         try (Connection conn = DriverManager.getConnection(url)) {
             PreparedStatement st = conn.prepareStatement("INSERT INTO CashUser " +
                     "(username, first_name, last_name, email, passwordhash) " +
@@ -35,38 +34,33 @@ public class UserController {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        LoginUser user = new LoginUser(newUser.Username, newUser.Password);
+        return user.login(url);
+    }
+
+    @CrossOrigin()
+    @PostMapping("/loginAuthentication")
+    public boolean loginAuthentication(@RequestBody LoginUserAuthentication user) {
+        if (user.usernameExists(url)) {
+            System.out.println("Username is there");
+            if (user.passwordMatch(salt,url)) {
+                System.out.println("Password Match");
+                return true;
+            } else {
+                System.out.println("Username match but Password is incorrect");
+                return false;
+            }
+        }
+        else {
+            System.out.println("It isn\'t there");
+            return false;
+    }
     }
 
     @CrossOrigin()
     @PostMapping("/login")
     public String login(@RequestBody LoginUser user) {
-        String loginHash = "";
-     try (Connection conn = DriverManager.getConnection(url)) {
-         PreparedStatement st = conn.prepareStatement("UPDATE CashUser SET loginhash = ? WHERE username = ?");
-         SecureRandom random = new SecureRandom();
-         byte bytes[] = new byte[20];
-         random.nextBytes(bytes);
-         String token = new String(bytes, "UTF-8");
-         st.setString(1, token);
-         st.setString(2, user.username);
-         st.executeUpdate();
-         st.close();
-         PreparedStatement ls = conn.prepareStatement("SELECT loginhash FROM CashUser WHERE username = ?");
-         ls.setString(1, user.username);
-         ResultSet rs = ls.executeQuery();
-         while (rs.next()) {
-             //Cash User Hash
-             loginHash = rs.getString(1);
-         }
-         ls.close();
-         rs.close();
-
-     } catch (SQLException e) {
-         e.printStackTrace();
-     } catch (UnsupportedEncodingException e) {
-         e.printStackTrace();
-     }
-     return loginHash;
+        return user.login(url);
     }
 
     @CrossOrigin()
@@ -74,7 +68,6 @@ public class UserController {
     public boolean usernameExists(@RequestBody String username) {
         int count = 0;
         try (Connection conn = DriverManager.getConnection(url)) {
-            System.out.println(username);
             PreparedStatement st = conn.prepareStatement("SELECT COUNT(username) FROM CashUser WHERE username = ? ");
             st.setString(1, username);
             ResultSet rs = st.executeQuery();
@@ -86,7 +79,6 @@ public class UserController {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        System.out.print(count);
         if (count > 0)
             return true;
         else
@@ -95,10 +87,10 @@ public class UserController {
 
     @CrossOrigin()
     @PostMapping("/logout")
-    public void logout(@RequestParam String username) {
+    public void logout(@RequestParam String loginhash) {
         try (Connection conn = DriverManager.getConnection(url)) {
-            PreparedStatement st = conn.prepareStatement("UPDATE CashUser SET loginhash = NULL WHERE username = (?)");
-            st.setString(1, username);
+            PreparedStatement st = conn.prepareStatement("UPDATE CashUser SET loginhash = NULL WHERE loginhash = (?)");
+            st.setString(1, loginhash);
             st.executeUpdate();
             st.close();
 
