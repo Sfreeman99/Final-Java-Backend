@@ -1,11 +1,12 @@
-package com.example.backend;
+package com.example.backend.routes;
 
+import com.example.backend.dao.LoginUser;
+import com.example.backend.dao.LoginUserAuthentication;
+import com.example.backend.model.SignupUser;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.UnsupportedEncodingException;
-import java.security.SecureRandom;
 import java.sql.*;
 
 @RestController

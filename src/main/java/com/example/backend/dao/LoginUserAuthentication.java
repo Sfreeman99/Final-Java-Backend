@@ -1,8 +1,6 @@
-package com.example.backend;
+package com.example.backend.dao;
 
 import org.mindrot.jbcrypt.BCrypt;
-import org.springframework.remoting.support.DefaultRemoteInvocationExecutor;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.sql.*;
 
