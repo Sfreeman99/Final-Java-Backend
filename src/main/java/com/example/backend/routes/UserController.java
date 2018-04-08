@@ -88,12 +88,13 @@ public class UserController {
 
     @CrossOrigin()
     @PostMapping("/logout")
-    public void logout(@RequestParam String loginhash) {
+    public void logout(@RequestBody String loginhash) {
         try (Connection conn = DriverManager.getConnection(url)) {
             PreparedStatement st = conn.prepareStatement("UPDATE CashUser SET loginhash = NULL WHERE loginhash = (?)");
             st.setString(1, loginhash);
             st.executeUpdate();
             st.close();
+            System.out.println("goodbye");
 
     } catch (SQLException e) {
             e.printStackTrace();
