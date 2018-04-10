@@ -1,8 +1,8 @@
 package com.example.backend.routes;
 
-import com.example.backend.model.CashUser;
-import com.example.backend.model.CashUserAuth;
-import com.example.backend.model.Transaction;
+import com.example.backend.dao.DepositDatabase;
+import com.example.backend.dao.WithdrawDatabase;
+import com.example.backend.model.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.*;
@@ -48,59 +48,30 @@ public class CashUserInformation {
 
     @CrossOrigin()
     @PostMapping("/deposit")
-    public void deposit( @RequestBody Transaction user){
-        try (Connection conn = DriverManager.getConnection(url)){
-            PreparedStatement st = conn.prepareStatement("UPDATE CashUser SET balance_in_pennies = balance_in_pennies + ? WHERE username = ?");
-            st.setInt(1, user.amount);
-            st.setString(2, user.username);
-            st.executeUpdate();
-            st.close();
-            PreparedStatement nextSt = conn.prepareStatement("INSERT INTO transactions (user_id, amount, type, reference) VALUES (?,?,?,?)");
-            nextSt.setInt(1, user.userId);
-            nextSt.setInt(2, user.amount);
-            nextSt.setString(3, "deposit");
-            nextSt.setInt(4, user.otherId);
-            nextSt.executeUpdate();
-            nextSt.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    public Transactions deposit( @RequestBody Deposit user){
+        return DepositDatabase.deposit(user, url);
     }
     @CrossOrigin()
     @PostMapping("/withdraw")
-    public void withdrawal(@RequestBody Transaction user) {
-        try (Connection conn = DriverManager.getConnection(url)) {
-            PreparedStatement st = conn.prepareStatement("UPDATE CashUser SET balance_in_pennies = balance_in_pennies - ? WHERE username = ?");
-            st.setInt(1, user.amount);
-            st.setString(2, user.username);
-            st.executeUpdate();
-            st.close();
-            PreparedStatement nextSt = conn.prepareStatement("INSERT INTO transactions (user_id, amount, type, reference) VALUES (?,?,?,?)");
-            nextSt.setInt(1, user.userId);
-            nextSt.setInt(2, user.amount);
-            nextSt.setString(3, "withdraw");
-            nextSt.setInt(4, user.otherId);
-            nextSt.executeUpdate();
-            nextSt.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    public Transactions withdrawal(@RequestBody Withdraw user) {
+        return WithdrawDatabase.withdraw(user, url);
     }
     @CrossOrigin()
     @GetMapping("/transactions/{id}")
-    public ArrayList<HashMap> transactions(@PathVariable int id){
+    public ArrayList<Transactions> transactions(@PathVariable int id){
         ArrayList transactions = new ArrayList();
         try (Connection conn = DriverManager.getConnection(url)) {
             PreparedStatement st = conn.prepareStatement("Select * from transactions where user_id = ?");
             st.setInt(1, id);
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
-                HashMap transaction = new HashMap();
-                transaction.put("id", rs.getInt("id"));
-                transaction.put("type", rs.getString("type"));
-                transaction.put("date", rs.getDate("day"));
-                transaction.put("amount", rs.getInt("amount"));
-                transaction.put("reference", rs.getInt("reference"));
+                Transactions transaction;
+                int transactionId = rs.getInt("id");
+                String type = rs.getString("type");
+                Date date = rs.getDate("day");
+                int amount = rs.getInt("amount");
+                int reference = rs.getInt("reference");
+                transaction = new Transactions(amount, transactionId, reference, type, date);
                 transactions.add(transaction);
             }
 
