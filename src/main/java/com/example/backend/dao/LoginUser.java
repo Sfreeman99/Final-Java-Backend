@@ -23,7 +23,7 @@ public class LoginUser {
             SecureRandom random = new SecureRandom();
             byte bytes[] = new byte[20];
             random.nextBytes(bytes);
-            String token = new String(bytes, "UTF-8");
+            String token = new String(bytes, "UTF8");
             st.setString(1, token);
             st.setString(2, this.username);
             st.executeUpdate();

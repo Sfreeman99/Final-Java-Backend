@@ -32,7 +32,6 @@ public class DepositDatabase {
             String type = currentDeposit.getString("type");
             Date date = currentDeposit.getDate("day");
             newTransaction = new Transactions(amount, transactionId, reference, type, date);
-            return newTransaction;
         } catch (SQLException e) {
             e.printStackTrace();
         }
