@@ -100,4 +100,14 @@ public class UserController {
             e.printStackTrace();
         }
     }
+
+    @CrossOrigin()
+    @DeleteMapping("/delete/{id}")
+    public void deleteAccount(@PathVariable int id) throws SQLException{
+        try (Connection conn = DriverManager.getConnection(url)) {
+            PreparedStatement st = conn.prepareStatement("DELETE FROM cashuser where id = ? ");
+            st.setInt(1, id);
+            st.execute();
+        }
+    }
 }
